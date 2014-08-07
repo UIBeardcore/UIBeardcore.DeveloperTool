@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<Configuration xmlns="http://www.sdltridion.com/2009/GUI/Configuration"
+	xmlns:ext="http://www.sdltridion.com/2009/GUI/extensions"
+	xmlns:cmenu="http://www.sdltridion.com/2009/GUI/extensions/ContextMenu">
+
+	<editors>
+
+		<editor xmlns="http://www.sdltridion.com/2009/GUI/Configuration" name="UIBeardcore.DeveloperTool.Editor">
+			<installpath>D:\von Eagle - Private\Projects\InternalProjects\UIBeardcore.DeveloperTool\UIBeardcore.DeveloperTool.Editor</installpath>
+			<configuration>Configuration\UIBeardcore.DeveloperTool.Editor.config</configuration>
+			<vdir>UIBCDevTool</vdir>
+		</editor>
+			
+	</editors>
+		
+</Configuration>
