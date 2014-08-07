@@ -4,7 +4,7 @@
     */
 (function ()
 {
-	var BEARDCORE_LOAD_BASE = "http://ua1dt2k9pt4j.global.sdl.corp:9077/";
+	var BEARDCORE_LOAD_BASE = "https://rawgit.com/UIBeardcore/UIBeardcore.DeveloperTool/master/Lite/";
 	var HIGHLIGHTJS_LOAD_BASE = "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/";
 
 	var sequanceId = 0;
@@ -30,7 +30,7 @@
 			this.appendResourceFile("highlight.css", HIGHLIGHTJS_LOAD_BASE + "/styles/vs.min.css", "link");
 			this.appendResourceFile("highlight.js", HIGHLIGHTJS_LOAD_BASE + "highlight.min.js", "script");
 
-			console.log("UI Beardcore Developer tool is initialized");
+			console.log("UI Beardcore :: Developer Tool is initializing...");
 		}
 	};
 
@@ -38,6 +38,8 @@
 	{
 		if (this.resourcesToLoad == 0)
 		{
+			console.log("UI Beardcore :: Developer Tool initialization is done. Have a nice day!");
+
 			this.initialized = true;
 
 			var tableElement = this.tableElement;
@@ -74,11 +76,11 @@
 
 		el['setAttribute']('id', id);
 
-		console.log("Loading resource :: " + filePath);
+		//console.log("Loading resource :: " + filePath);
 
 		var onResourceLoaded = Function.getDelegate(this, function UIBeardcore$DeveloperTool$appendResourceFile$onResourceLoaded()
 		{
-			console.log("onResource loaded :: " + filePath);
+			//console.log("onResource loaded :: " + filePath);
 			this.resourcesToLoad--;
 			this._onInitialized();
 		});
@@ -116,7 +118,7 @@
 
 	UIBeardcoreDeveloperTool.prototype.onRequestComplete = function UIBeardcore$DeveloperTool$onRequestComplete(requestId, result)
 	{
-		console.log("Request is Handled");
+		//console.log("Request is Handled");
 
 		var requestedItem = requestsTable[requestId];
 		if (requestedItem)
@@ -249,7 +251,7 @@
 						$css.addClass(el, "uibcdt-clickable");
 						$evt.addEventHandler(el, "dblclick", function DeveloperTool$ExpandItemContent()
 						{
-							console.log("dblclick ::  " + dialogTitle);
+							//console.log("dblclick ::  " + dialogTitle);
 
 							var activePopup = $popupManager.getActivePopup();
 							if (activePopup)
