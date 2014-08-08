@@ -253,12 +253,6 @@
 						{
 							//console.log("dblclick ::  " + dialogTitle);
 
-							var activePopup = $popupManager.getActivePopup();
-							if (activePopup)
-							{
-								activePopup.close();
-							}
-
 							function DeveloperTool$ExpandItemContent$onDialogClosed(event)
 							{
 								event.source.close();
@@ -271,16 +265,41 @@
 
 							var options = {};
 							options.className = "popupdialog messagebox uibcdt-responce-info";
-							options.popupType = $popupManager.Type.MESSAGE_BOX;
-							options.title = dialogTitle;
-							options.description = dialogContent;
+							options.popupType = Tridion.Controls.Popup.Type.MESSAGE_BOX;
 
-							var parameters = {};
-							parameters.width = 800;
-							parameters.height = 800;
+							var popup;
+							// For 2013 version
+							if ($popupManager)
+							{
+								options.title = dialogTitle;
+								options.description = dialogContent;
 
-							var popup = $popupManager.createExternalContentPopup(null, parameters, options);
-							$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
+								var parameters = {};
+								parameters.width = 800;
+								parameters.height = 800;
+
+								var popup = $popupManager.getActivePopup();
+								if (popup)
+								{
+									popup.close();
+									popup = null;
+								}
+
+								popup = $popupManager.createExternalContentPopup(null, parameters, options);
+								$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
+							}
+							// For 2011 version
+							else if ($popup)
+							{
+								var parameters = "width=800, height=800";
+								options.messageBoxType = Tridion.Controls.Popup.MessageType.CUSTOM_HTML;
+								options.customHtml = '<div class="Title">' + title + '</div>' + '<div class="Description">' + message + '</div>';
+
+								popup = $popup.create(null, parameters, options);
+								$evt.addEventHandler(popup, "unload", DeveloperTool$ExpandItemContent$onDialogClosed);
+							}
+
+
 							$evt.addEventHandler(popup, "open", DeveloperTool$ExpandItemContent$onDialogOpen);
 							popup.open();
 						});
