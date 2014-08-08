@@ -304,12 +304,17 @@
 	{
 		// Extend Existing functionality
 
-		Tridion.Type.registerNamespace("Tridion.Sys.Net");
+		//Tridion.Type.registerNamespace("Tridion.Sys.Net");
+		Tridion.Type.registerNamespace("Sys.Net");
 
-		if (Tridion.Sys.Net.WebRequest)
+		//if (Tridion.Sys.Net.WebRequest)
+		if (Sys.Net.WebRequest)
 		{
-			var _overridden$WebServiceProxy$invoke$UIBeardcore = Tridion.Sys.Net.WebRequest.prototype.invoke;
-			Tridion.Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
+			//var _overridden$WebServiceProxy$invoke$UIBeardcore = Tridion.Sys.Net.WebRequest.prototype.invoke;
+			//Tridion.Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
+
+			var _overridden$WebServiceProxy$invoke$UIBeardcore = Sys.Net.WebRequest.prototype.invoke;
+			Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
 			{
 				if (this.httpVerb == "POST")
 				{
