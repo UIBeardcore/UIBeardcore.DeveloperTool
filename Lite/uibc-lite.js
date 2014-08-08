@@ -4,7 +4,7 @@
     */
 (function ()
 {
-	var BEARDCORE_LOAD_BASE = "https://cdn.rawgit.com/UIBeardcore/UIBeardcore.DeveloperTool/master/Lite/";
+	var BEARDCORE_LOAD_BASE = "https://rawgit.com/UIBeardcore/UIBeardcore.DeveloperTool/master/Lite/";
 	//var BEARDCORE_LOAD_BASE = "http://localhost:9077/";
 	var HIGHLIGHTJS_LOAD_BASE = "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/";
 
