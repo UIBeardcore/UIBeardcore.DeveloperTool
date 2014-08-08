@@ -5,6 +5,7 @@
 (function ()
 {
 	var BEARDCORE_LOAD_BASE = "https://cdn.rawgit.com/UIBeardcore/UIBeardcore.DeveloperTool/master/Lite/";
+	//var BEARDCORE_LOAD_BASE = "http://localhost:9077/";
 	var HIGHLIGHTJS_LOAD_BASE = "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/";
 
 	var sequanceId = 0;
@@ -19,6 +20,7 @@
 	{
 		this.isInitialized = false;
 		this.resourcesToLoad = 0;
+		this.activePopup = null;
 	};
 
 	UIBeardcoreDeveloperTool.prototype.initialize = function UIBeardcoreDeveloperTool$initialize()
@@ -212,6 +214,71 @@
 		return rawData;
 	};
 
+	UIBeardcoreDeveloperTool.prototype.openPopup = function UIBeardcore$DeveloperTool$openPopup(dialogTitle, dialogContent)
+	{
+		function DeveloperTool$ExpandItemContent$onDialogClosed(event)
+		{
+			event.source.close();
+		};
+
+		function DeveloperTool$ExpandItemContent$onDialogOpen(event)
+		{
+			hljs.highlightBlock(event.source.properties.description);
+		};
+
+		var options = {};
+		options.className = "popupdialog messagebox uibcdt-responce-info";
+		options.popupType = Tridion.Controls.Popup.Type.MESSAGE_BOX;
+		options.title = dialogTitle;
+
+		var popup = this.activePopup;
+		if (popup)
+		{
+			popup.close();
+			popup = null;
+		}
+
+		var parameters = {};
+		parameters.width = 800;
+		parameters.height = 800;
+
+		// For 2013 version
+		if (Type.implementsInterface($popup, "Tridion.Controls.PopupManager"))
+		{
+			options.description = dialogContent;
+
+			popup = $popup.createExternalContentPopup(null, parameters, options);
+
+			$evt.addEventHandler(popup, "open", DeveloperTool$ExpandItemContent$onDialogOpen);
+		}
+		// For 2011 version
+		else if (Type.implementsInterface($popup, "Tridion.Controls.Popup"))
+		{
+			parameters.height = null;
+			options.header = dialogTitle;
+			options.messageBoxType = Tridion.Controls.Popup.MessageType.CUSTOM_HTML;
+			options.customHtml = dialogContent;
+
+			popup = $popup.create(null, parameters, options);
+
+			setTimeout(function()
+			{
+				hljs.highlightBlock(popup.properties.dialogCenter);
+			}, 0);
+		}
+		else
+		{
+			alert("Unsupporterd version");
+			return;
+		}
+
+		
+		$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
+		popup.open();
+
+		this.activePopup = popup;
+	};
+
 	UIBeardcoreDeveloperTool.prototype._updateBoxStatus = function UIBeardcore$DeveloperTool$_updateBoxStatus()
 	{
 		var tableElement = this.tableElement;
@@ -249,60 +316,7 @@
 						var dialogContent = this.getPrettifiedContent(requestedItem.result);
 
 						$css.addClass(el, "uibcdt-clickable");
-						$evt.addEventHandler(el, "dblclick", function DeveloperTool$ExpandItemContent()
-						{
-							//console.log("dblclick ::  " + dialogTitle);
-
-							function DeveloperTool$ExpandItemContent$onDialogClosed(event)
-							{
-								event.source.close();
-							};
-
-							function DeveloperTool$ExpandItemContent$onDialogOpen(event)
-							{
-								hljs.highlightBlock(event.source.properties.description);
-							};
-
-							var options = {};
-							options.className = "popupdialog messagebox uibcdt-responce-info";
-							options.popupType = Tridion.Controls.Popup.Type.MESSAGE_BOX;
-
-							var popup;
-							// For 2013 version
-							if ($popupManager)
-							{
-								options.title = dialogTitle;
-								options.description = dialogContent;
-
-								var parameters = {};
-								parameters.width = 800;
-								parameters.height = 800;
-
-								var popup = $popupManager.getActivePopup();
-								if (popup)
-								{
-									popup.close();
-									popup = null;
-								}
-
-								popup = $popupManager.createExternalContentPopup(null, parameters, options);
-								$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
-							}
-							// For 2011 version
-							else if ($popup)
-							{
-								var parameters = "width=800, height=800";
-								options.messageBoxType = Tridion.Controls.Popup.MessageType.CUSTOM_HTML;
-								options.customHtml = '<div class="Title">' + title + '</div>' + '<div class="Description">' + message + '</div>';
-
-								popup = $popup.create(null, parameters, options);
-								$evt.addEventHandler(popup, "unload", DeveloperTool$ExpandItemContent$onDialogClosed);
-							}
-
-
-							$evt.addEventHandler(popup, "open", DeveloperTool$ExpandItemContent$onDialogOpen);
-							popup.open();
-						});
+						$evt.addEventHandler(el, "dblclick", Function.getDelegate(this, this.openPopup, [dialogTitle, dialogContent]));
 					}
 				}
 

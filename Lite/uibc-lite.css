@@ -69,7 +69,8 @@
 	position: relative;
 }
 
-.messagebox.uibcdt-responce-info .Description
+.messagebox.uibcdt-responce-info .Description,
+.messagebox.uibcdt-responce-info .Center
 {
 	white-space: pre;
 	position: absolute;
@@ -82,6 +83,15 @@
 	padding: 5px 10px;
 	font-family: monospace;
 	font-size: 11px;
+}
+
+/* SDL Tridion 2011 */
+.messagebox.uibcdt-responce-info .Center
+{
+	position: relative;
+	top: 0px;
+	bottom: 0;
+	max-height: none;
 }
 
 .messagebox.uibcdt-responce-info .ButtonsHandler
