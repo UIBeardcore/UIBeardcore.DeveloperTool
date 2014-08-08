@@ -4,7 +4,9 @@
     */
 (function ()
 {
-	var BEARDCORE_LOAD_BASE = "http://ua1dt2k9pt4j.global.sdl.corp:9077/";
+	var BEARDCORE_LOAD_BASE = "https://cdn.rawgit.com/UIBeardcore/UIBeardcore.DeveloperTool/master/Lite/v.0/";
+	//var BEARDCORE_LOAD_BASE = "http://localhost:9077/";
+	var HIGHLIGHTJS_LOAD_BASE = "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/";
 
 	var sequanceId = 0;
 	var requestsTable = [];
@@ -18,6 +20,7 @@
 	{
 		this.isInitialized = false;
 		this.resourcesToLoad = 0;
+		this.activePopup = null;
 	};
 
 	UIBeardcoreDeveloperTool.prototype.initialize = function UIBeardcoreDeveloperTool$initialize()
@@ -26,10 +29,10 @@
 		{
 			this.appendResourceFile("uibc-lite.css", BEARDCORE_LOAD_BASE + "uibc-lite.css", "link");
 
-			this.appendResourceFile("highlight.css", "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/vs.min.css", "link");
-			this.appendResourceFile("highlight.js", "http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js", "script");
+			this.appendResourceFile("highlight.css", HIGHLIGHTJS_LOAD_BASE + "/styles/vs.min.css", "link");
+			this.appendResourceFile("highlight.js", HIGHLIGHTJS_LOAD_BASE + "highlight.min.js", "script");
 
-			console.log("UI Beardcore Developer tool is initialized");
+			console.log("UI Beardcore :: Developer Tool is initializing...");
 		}
 	};
 
@@ -37,6 +40,8 @@
 	{
 		if (this.resourcesToLoad == 0)
 		{
+			console.log("UI Beardcore :: Developer Tool initialization is done. Have a nice day!");
+
 			this.initialized = true;
 
 			var tableElement = this.tableElement;
@@ -73,11 +78,11 @@
 
 		el['setAttribute']('id', id);
 
-		console.log("Loading resource :: " + filePath);
+		//console.log("Loading resource :: " + filePath);
 
 		var onResourceLoaded = Function.getDelegate(this, function UIBeardcore$DeveloperTool$appendResourceFile$onResourceLoaded()
 		{
-			console.log("onResource loaded :: " + filePath);
+			//console.log("onResource loaded :: " + filePath);
 			this.resourcesToLoad--;
 			this._onInitialized();
 		});
@@ -115,7 +120,7 @@
 
 	UIBeardcoreDeveloperTool.prototype.onRequestComplete = function UIBeardcore$DeveloperTool$onRequestComplete(requestId, result)
 	{
-		console.log("Request is Handled");
+		//console.log("Request is Handled");
 
 		var requestedItem = requestsTable[requestId];
 		if (requestedItem)
@@ -209,6 +214,71 @@
 		return rawData;
 	};
 
+	UIBeardcoreDeveloperTool.prototype.openPopup = function UIBeardcore$DeveloperTool$openPopup(dialogTitle, dialogContent)
+	{
+		function DeveloperTool$ExpandItemContent$onDialogClosed(event)
+		{
+			event.source.close();
+		};
+
+		function DeveloperTool$ExpandItemContent$onDialogOpen(event)
+		{
+			hljs.highlightBlock(event.source.properties.description);
+		};
+
+		var options = {};
+		options.className = "popupdialog messagebox uibcdt-responce-info";
+		options.popupType = Tridion.Controls.Popup.Type.MESSAGE_BOX;
+		options.title = dialogTitle;
+
+		var popup = this.activePopup;
+		if (popup)
+		{
+			popup.close();
+			popup = null;
+		}
+
+		var parameters = {};
+		parameters.width = 800;
+		parameters.height = 800;
+
+		// For 2013 version
+		if (Type.implementsInterface($popup, "Tridion.Controls.PopupManager"))
+		{
+			options.description = dialogContent;
+
+			popup = $popup.createExternalContentPopup(null, parameters, options);
+
+			$evt.addEventHandler(popup, "open", DeveloperTool$ExpandItemContent$onDialogOpen);
+		}
+		// For 2011 version
+		else if (Type.implementsInterface($popup, "Tridion.Controls.Popup"))
+		{
+			parameters.height = null;
+			options.header = dialogTitle;
+			options.messageBoxType = Tridion.Controls.Popup.MessageType.CUSTOM_HTML;
+			options.customHtml = dialogContent;
+
+			popup = $popup.create(null, parameters, options);
+
+			setTimeout(function()
+			{
+				hljs.highlightBlock(popup.properties.dialogCenter);
+			}, 0);
+		}
+		else
+		{
+			alert("Unsupporterd version");
+			return;
+		}
+
+		
+		$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
+		popup.open();
+
+		this.activePopup = popup;
+	};
+
 	UIBeardcoreDeveloperTool.prototype._updateBoxStatus = function UIBeardcore$DeveloperTool$_updateBoxStatus()
 	{
 		var tableElement = this.tableElement;
@@ -246,41 +316,7 @@
 						var dialogContent = this.getPrettifiedContent(requestedItem.result);
 
 						$css.addClass(el, "uibcdt-clickable");
-						$evt.addEventHandler(el, "dblclick", function DeveloperTool$ExpandItemContent()
-						{
-							console.log("dblclick ::  " + dialogTitle);
-
-							var activePopup = $popupManager.getActivePopup();
-							if (activePopup)
-							{
-								activePopup.close();
-							}
-
-							function DeveloperTool$ExpandItemContent$onDialogClosed(event)
-							{
-								event.source.close();
-							};
-
-							function DeveloperTool$ExpandItemContent$onDialogOpen(event)
-							{
-								hljs.highlightBlock(event.source.properties.description);
-							};
-
-							var options = {};
-							options.className = "popupdialog messagebox uibcdt-responce-info";
-							options.popupType = $popupManager.Type.MESSAGE_BOX;
-							options.title = dialogTitle;
-							options.description = dialogContent;
-
-							var parameters = {};
-							parameters.width = 800;
-							parameters.height = 800;
-
-							var popup = $popupManager.createExternalContentPopup(null, parameters, options);
-							$evt.addEventHandler(popup, "dialog_closed", DeveloperTool$ExpandItemContent$onDialogClosed);
-							$evt.addEventHandler(popup, "open", DeveloperTool$ExpandItemContent$onDialogOpen);
-							popup.open();
-						});
+						$evt.addEventHandler(el, "dblclick", Function.getDelegate(this, this.openPopup, [dialogTitle, dialogContent]));
 					}
 				}
 
@@ -301,12 +337,17 @@
 	{
 		// Extend Existing functionality
 
-		Tridion.Type.registerNamespace("Tridion.Sys.Net");
+		//Tridion.Type.registerNamespace("Tridion.Sys.Net");
+		Tridion.Type.registerNamespace("Sys.Net");
 
-		if (Tridion.Sys.Net.WebRequest)
+		//if (Tridion.Sys.Net.WebRequest)
+		if (Sys.Net.WebRequest)
 		{
-			var _overridden$WebServiceProxy$invoke$UIBeardcore = Tridion.Sys.Net.WebRequest.prototype.invoke;
-			Tridion.Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
+			//var _overridden$WebServiceProxy$invoke$UIBeardcore = Tridion.Sys.Net.WebRequest.prototype.invoke;
+			//Tridion.Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
+
+			var _overridden$WebServiceProxy$invoke$UIBeardcore = Sys.Net.WebRequest.prototype.invoke;
+			Sys.Net.WebRequest.prototype.invoke = function WebRequest$realinvoke()
 			{
 				if (this.httpVerb == "POST")
 				{
